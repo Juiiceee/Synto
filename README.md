@@ -17,13 +17,13 @@ To use the web interface, these requisites must be met:
 **1. Clone the repository to a directory on your pc via command prompt:**
 
 ```
-git clone https://github.com/toukoum/oxford/
+git clone https://github.com/Juiiceee/DEFAI_Sonic
 ```
 
 **2. Open the folder:**
 
 ```
-cd oxford
+cd DEFAI_Sonic
 ```
 
 **3. Rename the `.example.env` to `.env`:**
