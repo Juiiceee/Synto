@@ -9,7 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.1.8",
+    "@ai-sdk/openai": "^1.2.1",
+    "@ai-sdk/react": "^1.1.21",
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
     "@emotion/react": "^11.14.0",
@@ -17,6 +18,7 @@
     "@hookform/resolvers": "^3.10.0",
     "@langchain/community": "^0.3.28",
     "@langchain/core": "^0.3.37",
+    "@lordicon/react": "^1.10.1",
     "@mui/material": "^6.4.2",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-avatar": "^1.1.2",
@@ -43,13 +45,14 @@
     "@traderjoe-xyz/sdk-v2": "^3.0.21",
     "@types/dom-speech-recognition": "^0.0.4",
     "@wagmi/core": "^2.16.4",
-    "ai": "^4.1.16",
+    "ai": "^4.1.54",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "emoji-mart": "^5.6.0",
     "framer-motion": "^11.18.2",
     "langchain": "^0.3.15",
     "lodash": "^4.17.21",
+    "lottie-web": "^5.12.2",
     "lucide-react": "^0.445.0",
     "motion": "^12.4.1",
     "next": "^14.2.23",
@@ -72,7 +75,7 @@
     "vaul": "^1.1.2",
     "viem": "^2.22.23",
     "wagmi": "^2.14.9",
-    "zod": "^3.24.1",
+    "zod": "^3.24.2",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
