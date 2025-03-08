@@ -28,6 +28,7 @@ cd Synto
 
 **3. Rename the `.example.env` to `.env`:**
 
+
 ```
 mv .example.env .env
 ```
