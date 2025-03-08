@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
 	DrawerClose,
@@ -7,6 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import { Drawer } from "vaul";
 import Link from "next/link";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface NavLinkProps {
 	activeLink: string;
@@ -16,6 +18,7 @@ interface NavLinkProps {
 
 const NavLinkMobile: React.FC<NavLinkProps> = ({ activeLink, isMenuOpen, onClose }) => {
 	const [open, setOpen] = useState(false);
+	const { wallet } = useWallet();
 
 	useEffect(() => {
 		setOpen(isMenuOpen);
@@ -29,6 +32,7 @@ const NavLinkMobile: React.FC<NavLinkProps> = ({ activeLink, isMenuOpen, onClose
 	const links: [string, string][] = [
 		["/", "Home"],
 		["/sonic", "Hackathon"],
+		...(wallet ? [["/create", "Create Tools"]] : []),
 	];
 
 	return (
