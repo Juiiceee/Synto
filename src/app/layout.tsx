@@ -8,31 +8,31 @@ import { ThemeProvider } from "next-themes";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Synto",
-  description: "Our Hackathon project",
-  icons: {
-    icon: [{ rel: "icon", url: "/black_logo.svg", type: "image/svg+xml" }],
-  },
+	title: "Synto",
+	description: "Our Hackathon project",
+	icons: {
+		icon: [{ rel: "icon", url: "/soin.png", type: "image/png" }],
+	},
 };
 
 export const viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: 1,
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 1,
+	userScalable: 1,
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`antialiased tracking-tight ${inter.className}`}>
-        <ThemeProvider attribute="class" defaultTheme="dark">
-          <Wallet>{children}</Wallet>
-          <Toaster />
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<body className={`antialiased tracking-tight ${inter.className}`}>
+				<ThemeProvider attribute="class" defaultTheme="dark">
+					<Wallet>{children}</Wallet>
+					<Toaster />
+				</ThemeProvider>
+			</body>
+		</html>
+	);
 }
