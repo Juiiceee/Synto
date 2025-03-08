@@ -472,7 +472,7 @@ function ChatMessage({
 			<ChatBubble variant={message.role === "user" ? "sent" : "received"}>
 				{message.role === "assistant" && (
 					<ChatBubbleAvatar
-						src={message.role === "assistant" ? "/logo-avax.png" : ""}
+						src={message.role === "assistant" ? "/Sonic.png" : ""}
 						width={6}
 						height={6}
 						className="object-contain"

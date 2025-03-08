@@ -6,13 +6,13 @@ import { useEffect, useState } from "react";
 import { useMediaQuery } from "@mui/material";
 import NavLinkMobile from "./NavLinkMobile";
 import Image from "next/image";
-import {useWallet} from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import dynamic from "next/dynamic";
 
 // Import dynamically with no SSR
 const WalletMultiButton = dynamic(
-  () => import("@solana/wallet-adapter-react-ui").then((mod) => mod.WalletMultiButton),
-  { ssr: false }
+	() => import("@solana/wallet-adapter-react-ui").then((mod) => mod.WalletMultiButton),
+	{ ssr: false }
 );
 
 const Header = () => {
@@ -43,13 +43,13 @@ const Header = () => {
 				<a href="/" className="flex items-center space-x-4">
 					<div className="flex items-center space-x-4">
 						<Image
-							src="/red_logo.svg"
-							alt="Defai Logo"
-							width={32}
-							height={32}
-							className="w-6 h-6"
+							src="/soin.png"
+							alt="Synto Logo"
+							width={36}
+							height={36}
+							className="w-8 h-8"
 						/>
-						<h1 className="text-sm font-bold text-foreground">Defai  <span className="text-muted-foreground font-light ml-2">Sonic</span></h1>
+						<h1 className="text-sm font-bold text-foreground">Synto</h1>
 					</div>
 				</a>
 

@@ -71,7 +71,7 @@ export default function ChatTopbar({
 					className="py-2 cursor-pointer hover:bg-secondary rounded-lg"
 				>
 					<Image 
-						src="/red_logo.svg"
+						src="/soin.png"
 						alt="logo"
 						width={40}
 						height={40}

@@ -11,10 +11,10 @@ function copyToClipboard(text: string) {
 
 export default function CardList() {
   const cards = [
-    "Send 0.2 AVAX to 0x578dC842Bb55bb8b73472d69Fa2097ed1C19c46a",
-    "How much AVAX do I have remaining?",
-    "Swap 10 USDC for AVAX",
-    "What is the value of 10 AVAX in USD?",
+    "Send 0.2 SONIC to 0x578dC842Bb55bb8b73472d69Fa2097ed1C19c46a",
+    "How much SONIC do I have remaining?",
+    "Swap 10 USDC for SONIC",
+    "What is the value of 10 SONIC in USD?",
   ];
 
   return (

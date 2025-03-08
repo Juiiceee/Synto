@@ -5,7 +5,7 @@ import { parseUnits } from "viem";
 
 
 export const send = tool({
-	description: "send AVAX from your connected wallet to another address on the Sonic Fuji testnet. ASK FOR CONFIRMATION BEFORE USING THIS TOOL.",
+	description: "send SONIC from your connected wallet to another address on the Sonic Fuji testnet. ASK FOR CONFIRMATION BEFORE USING THIS TOOL.",
 	parameters: z.object({
 		to: z.string().min(42).max(42).describe("Recipient AVAX address."),
 		amount: z.number().positive().describe("Amount of AVAX to send."),

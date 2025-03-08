@@ -8,7 +8,7 @@ import { ThemeProvider } from "next-themes";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Defai",
+  title: "Synto",
   description: "Our Hackathon project",
   icons: {
     icon: [{ rel: "icon", url: "/black_logo.svg", type: "image/svg+xml" }],

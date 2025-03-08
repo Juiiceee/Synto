@@ -41,7 +41,7 @@ export default function ChatList({
         {loadingSubmit && (
           <ChatBubble variant="received">
             <ChatBubbleAvatar
-              src="/logo-avax.png"
+              src="/Sonic.png"
               width={6}
               height={6}
               className="object-contain"

@@ -86,8 +86,8 @@ export default function LandingPage() {
 				<div className="mt-12 w-full mx-auto">
 					<div className="flex items-center gap-4 mb-4">
 						<Image
-							src="/logo-avax.png"
-							alt="Defai Logo"
+							src="/Sonic.png"
+							alt="Sonic Logo"
 							width={500}
 							height={500}
 							className="h-8 w-8 object-contain"
@@ -100,7 +100,7 @@ export default function LandingPage() {
 						autoComplete="off"
 						name="message"
 						className="pointer-events-none shadow-2xl bg-accent resize-none text-avax text-bold text-xl px-4 py-6 placeholder:text-zinc-100 disabled:opacity-50 w-full rounded-md"
-						placeholder="Swap 100 USDC to AVAX..."
+						placeholder="Swap 100 USDC to SONIC..."
 					/>
 				</div>
 
@@ -116,7 +116,7 @@ export default function LandingPage() {
 			</LampContainer>
 
 			<div className="container items-center max-w-lg text-center flex flex-col w-full mt-24 mb-48">
-				<p className="relative -mb-2 z-20 bg-gradient-to-b text-avax bg-clip-text py-8 text-4xl font-thin sm:text-7xl">Defai</p>
+				<p className="relative -mb-2 z-20 bg-gradient-to-b text-avax bg-clip-text py-8 text-4xl font-thin sm:text-7xl">Synto</p>
 				<p className="text-lg font-light text-foreground">
 					<span className="text-avax font-semibold">DE</span>centralized <span className="text-avax font-semibold">F</span>inance <span className="text-avax font-semibold">A</span>rtificial <span className="text-avax font-semibold">I</span>ntelligence
 				</p>

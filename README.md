@@ -17,13 +17,13 @@ To use the web interface, these requisites must be met:
 **1. Clone the repository to a directory on your pc via command prompt:**
 
 ```
-git clone https://github.com/Juiiceee/DEFAI_Sonic
+git clone https://github.com/Juiiceee/Synto
 ```
 
 **2. Open the folder:**
 
 ```
-cd DEFAI_Sonic
+cd Synto
 ```
 
 **3. Rename the `.example.env` to `.env`:**

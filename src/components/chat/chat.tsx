@@ -11,7 +11,7 @@ import ChatBottombar from "./chat-bottombar";
 import ChatList from "./chat-list";
 import ChatTopbar from "./chat-topbar";
 import { Card, CardContent } from "../ui/card";
-import CardList  from "./CardList";
+import CardList from "./CardList";
 
 export interface ChatProps {
 	id: string;
@@ -52,7 +52,7 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 		},
 		onToolCall: (tool) => {
 			if (tool.toolCall.toolName == "getAvaxBalance") {
-				toast("Checking your AVAX balance...");
+				toast("Checking your SONIC balance...");
 				// here get the balance from the wallet
 			}
 		}
@@ -119,8 +119,14 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 			{messages.length === 0 ? (
 				<div className="flex flex-col h-full w-full items-center gap-4 justify-center">
 
-					<h1 className="scale-x-[-1] text-[80px] -mb-6 font-bold">D</h1>
-					<h2 className="text-2xl mb-6">Defai</h2>
+					<Image
+						src="/soin.png"
+						alt="Synto Logo"
+						width={100}
+						height={100}
+						className="w-30 h-30"
+					/>
+					<h2 className="text-2xl mb-6">Synto</h2>
 
 
 					<p className="self-start pl-6 text-base text-foreground">
@@ -137,10 +143,10 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 						isToolInProgress={isToolInProgress}
 						isMiddle={true}
 					/>
-					
+
 					<CardList />
 
-				
+
 
 				</div>
 			) : (
