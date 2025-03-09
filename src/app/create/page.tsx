@@ -13,10 +13,15 @@ import "../globals.css";
 
 export default function Create() {
 	const [title, setTitle] = useState<string>("");
-	const questions = [
+	const [description, setDescription] = useState<string>("");
+	const [questions, setQuestions] = useState<string[]>([
 		"Est ce que Tokoum est un chien ?",
 		"Comment conjuguer le verbe Feur?"
-	];
+	]);
+
+	const addQuestion = () => {
+		setQuestions([...questions, ""]);
+	};
 
 	return (
 		<div>
@@ -25,7 +30,7 @@ export default function Create() {
 				{/* Main Content */}
 				<div className="max-w-6xl mx-auto p-6">
 					<Tabs defaultValue="create" className="mb-8">
-						<TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent" color="indigo">
+						<TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
 							<TabsTrigger
 								value="create"
 								className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
@@ -53,13 +58,13 @@ export default function Create() {
 							<div className="space-y-4">
 								<div>
 									<label className="text-sm font-medium mb-1.5 block">Name</label>
-									<Input placeholder="IFRS Advisor" className="bg-secondary border-0" />
+									<Input placeholder="Token listing" className="bg-secondary border-0" />
 								</div>
 
 								<div>
 									<label className="text-sm font-medium mb-1.5 block">Description</label>
 									<Input
-										placeholder="Expert in IFRS, aiding in financial reporting and compliance"
+										placeholder="Create a token and list it on pump.fun"
 										className="bg-secondary border-0"
 									/>
 								</div>
@@ -68,7 +73,7 @@ export default function Create() {
 									<label className="text-sm font-medium mb-1.5 block">Instructions</label>
 									<Textarea
 										className="min-h-[200px] bg-secondary border-0"
-										placeholder="Your role is to assist accountants and auditors..."
+										placeholder="Your role is to assist a token creator..."
 									/>
 								</div>
 
@@ -83,12 +88,12 @@ export default function Create() {
 												</Button>
 											</div>
 										))}
-										<Button variant="outline" className="w-full">Add conversation starter</Button>
+										<Button variant="outline" className="w-full" onClick={addQuestion}>Add conversation starter</Button>
 									</div>
 								</div>
 
 								<div>
-									<h3 className="text-sm font-medium mb-1.5">Knowledge</h3>
+									<h3 className="text-sm font-medium mb-1.5">Tools Picture</h3>
 									<Button variant="outline" className="w-full">Upload files</Button>
 								</div>
 
@@ -116,11 +121,11 @@ export default function Create() {
 						<div className="bg-secondary/50 rounded-lg p-6">
 							<div className="flex items-center gap-4 mb-8">
 								<div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-									<img src="/placeholder.jpg" alt="IFRS Advisor" className="h-full w-full rounded-full object-cover" />
+									<img src="/pumpFun.webp" alt="IFRS Advisor" className="h-full w-full rounded-full object-cover" />
 								</div>
 								<div>
-									<h2 className="text-xl font-semibold">IFRS Advisor</h2>
-									<p className="text-sm text-muted-foreground">Expert in IFRS, aiding in financial reporting and compliance</p>
+									<h2 className="text-xl font-semibold">{!title ? "Token listing" : title}</h2>
+									<p className="text-sm text-muted-foreground">{!description ? "Create a token and list it on pump.fun" : description}</p>
 								</div>
 							</div>
 
@@ -138,7 +143,7 @@ export default function Create() {
 
 							<div className="relative mt-4">
 								<Input
-									placeholder="Message IFRS Advisor..."
+									placeholder="Message Token listing..."
 									className="bg-background/50 border-0"
 								/>
 							</div>
