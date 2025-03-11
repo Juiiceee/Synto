@@ -27,8 +27,9 @@ export const Wallet: FC<WalletProps> = ({ children }) => {
     const network = WalletAdapterNetwork.Devnet;
 
     // You can also provide a custom RPC endpoint.
-    const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-
+    const endpoint = useMemo(() => "https://api.devnet.solana.com", []);
+// https://api.devnet.solana.com
+// https://api.testnet.sonic.game
     const wallets = useMemo(
         () => [
             new PhantomWalletAdapter(),

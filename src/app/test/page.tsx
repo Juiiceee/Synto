@@ -1,201 +1,177 @@
 "use client";
-import {
-  ChainId,
-  WNATIVE,
-  Token,
-  TokenAmount,
-  Percent,
-} from "@traderjoe-xyz/sdk-core";
-import {
-  PairV2,
-  RouteV2,
-  TradeV2,
-  TradeOptions,
-  LB_ROUTER_V22_ADDRESS,
-  jsonAbis,
-} from "@traderjoe-xyz/sdk-v2";
-import {
-  createPublicClient,
-  createWalletClient,
-  http,
-  parseUnits,
-  BaseError,
-  ContractFunctionRevertedError,
-} from "viem";
-import { avalancheFuji } from "viem/chains";
-// import { useBalance, useAccount, useWriteContract } from "wagmi";
 
-export default function SwapComponent() {
-//   const { address } = useAccount();
-  const { LBRouterV22ABI } = jsonAbis;
-  const CHAIN_ID = 43113;
-  const router = LB_ROUTER_V22_ADDRESS[CHAIN_ID];
-  const WAVAX = WNATIVE[CHAIN_ID];
-  const USDC = new Token(
-    CHAIN_ID,
-    "0xB6076C93701D6a07266c31066B298AeC6dd65c2d",
-    6,
-    "USDC",
-    "USD Coin"
-  );
+import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
+import { useState } from 'react';
+import { toast } from "react-hot-toast";
+import { AnchorProvider, Program, setProvider, BN } from "@coral-xyz/anchor";
+import { MintPay } from "@/../mintPay/target/types/mint_pay";
+import idl from "@/../mintPay/target/idl/mint_pay.json";
+import { MPL_CORE_PROGRAM_ID } from "@metaplex-foundation/mpl-core";
+// import { PublicKey } from '@metaplex-foundation/umi';
+import { Connection, Keypair, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction } from "@solana/web3.js";
 
-  const USDT = new Token(
-    CHAIN_ID,
-    "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
-    6,
-    "USDT",
-    "Tether USD"
-  );
+export default function Test() {
+	const wallet = useAnchorWallet();
+	const { connection } = useConnection();
+	const mint = async () => {
+		if (!wallet) {
+			toast.error("Please connect your wallet");
+			return;
+		}
+		try {
+			const provider = new AnchorProvider(connection, wallet, {
+				commitment: "confirmed",
+			});
+			setProvider(provider);
+			const program = new Program(idl as MintPay, provider);
+			const asset = Keypair.generate();
 
-  const BASES = [WAVAX, USDC, USDT];
-  const inputToken = USDC;
-  const outputToken = WAVAX;
-  const isExactIn = true;
-  const typedValueIn = "20";
-  const typedValueInParsed = parseUnits(typedValueIn, inputToken.decimals);
-  const amountIn = new TokenAmount(inputToken, typedValueInParsed);
+			console.log("\nAsset address: ", asset.publicKey.toBase58());
+			const tx = await program.methods
+				.initializeMint("salut", "htpps://feur.com")
+				.accountsStrict({
+					user: wallet.publicKey,
+					mint: asset.publicKey,
+					systemProgram: SystemProgram.programId,
+					mplCoreProgram: new PublicKey("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")
+				})
+				.signers([asset])
+				.rpc();
 
-  const allTokenPairs = PairV2.createAllTokenPairs(
-    inputToken,
-    outputToken,
-    BASES
-  );
+			console.log(`Transaction signature: ${tx}`);
+			toast.success(`Artist registered successfully!: ${tx}`);
+		} catch (error: any) {
+			console.error("Error initializing musician:", error);
+			toast.error(`Failed to register artist: ${error.message}`);
+		}
+	}
+	/*const [collection, setCollection] = useState<PublicKey | null>(null)
+	const [loading, setLoading] = useState<boolean>(false)
+	const [error, setError] = useState<string | null>(null)
+	const connection = new Connection("https://api.testnet.sonic.game", "confirmed");
+	// Create UMI instance with all necessary plugins
+	const umi = createUmi('https://api.devnet.solana.com')
+		.use(mplCandyMachine())
+		.use(walletAdapterIdentity(wallet))
+		.use(mplCore()).use(mplTokenMetadata())
 
-//   const { 
-//     data: approvalHash, 
-//     writeContract: writeApproval, 
-//     error: approvalError,
-//     isSuccess: isApprovalSuccess,
-//   } = useWriteContract();
+	const createCol = async () => {
+		try {
+			setLoading(true);
+			setError(null);
 
-//   const { 
-//     data: swapHash, 
-//     writeContract: writeSwap,
-//     error: swapError 
-//   } = useWriteContract();
+			const collectionSigner = generateSigner(umi);
 
-  const allPairs = PairV2.initPairs(allTokenPairs);
-  const allRoutes = RouteV2.createAllRoutes(allPairs, inputToken, outputToken);
+			console.log("Creating collection...");
+			const tx = createCollection(umi, {
+				collection: collectionSigner,
+				name: 'My Collection',
+				uri: 'https://example.com/my-collection.json',
+			});
 
-//   const publicClient = createPublicClient({
-//     chain: avalancheFuji,
-//     key: address,
-//     transport: http(),
-//   });
+			await tx.sendAndConfirm(umi);
+			setCollection(new PublicKey(collectionSigner.publicKey));
+			console.log("Collection created: " + collectionSigner.publicKey.toString());
+		} catch (err) {
+			console.error("Error creating collection:", err);
+			setError(err instanceof Error ? err.message : String(err));
+		} finally {
+			setLoading(false);
+		}
+	}
 
-//   async function approveToken() {
-//     try {
-//       await writeApproval({
-//         address: "0xB6076C93701D6a07266c31066B298AeC6dd65c2d",
-//         abi: [
-//           {
-//             name: "approve",
-//             type: "function",
-//             stateMutability: "nonpayable",
-//             inputs: [
-//               {
-//                 name: "spender",
-//                 type: "address"
-//               },
-//               {
-//                 name: "amount",
-//                 type: "uint256"
-//               }
-//             ],
-//             outputs: [
-//               {
-//                 name: "",
-//                 type: "bool"
-//               }
-//             ]
-//           }
-//         ],
-//         functionName: "approve",
-//         args: [router, parseUnits('200', 6)],
-//       });
-//     } catch (error) {
-//       console.error("❌ Approve failed:", error);
-//     }
-//   }
+	const createCandy = async () => {
+		try {
+			setLoading(true);
+			setError(null);
 
-//   async function executeSwap() {
-//     if (!isApprovalSuccess) {
-//       console.error("Please approve USDC first");
-//       return;
-//     }
+			if (!collection) {
+				throw new Error("Please create a collection first");
+			}
 
-    // try {
-    //   const trades = await TradeV2.getTradesExactIn(
-    //     allRoutes,
-    //     amountIn,
-    //     outputToken,
-    //     false,
-    //     true,
-    //     publicClient,
-    //     CHAIN_ID
-    //   );
+			const candyMachine = generateSigner(umi);
 
-    //   const validTrades = trades.filter((trade): trade is TradeV2 => trade !== undefined);
-    //   const bestTrade = TradeV2.chooseBestTrade(validTrades, isExactIn);
+			console.log("Creating candy machine...", candyMachine.publicKey.toString());
+			const createIx = await create(umi, {
+				candyMachine,
+				collection: collection,
+				collectionUpdateAuthority: umi.identity,
+				itemsAvailable: 1000,
+				authority: umi.identity.publicKey,
+				isMutable: true,
+			});
 
-    //   if (bestTrade) {
-    //     const { totalFeePct, feeAmountIn } = await bestTrade.getTradeFee();
-    //     console.log("Total fees percentage", totalFeePct.toSignificant(6), "%");
-    //     console.log(`Fee: ${feeAmountIn.toSignificant(6)} ${feeAmountIn.token.symbol}`);
+			await createIx.sendAndConfirm(umi);
+			console.log("Candy Machine created: " + candyMachine.publicKey.toString());
+		} catch (err) {
+			console.error("Error creating candy machine:", err);
+			setError(err instanceof Error ? err.message : String(err));
+		} finally {
+			setLoading(false);
+		}
+	}
 
-    //     const userSlippageTolerance = new Percent("200", "10000");
-    //     const swapOptions: TradeOptions = {
-    //       allowedSlippage: userSlippageTolerance,
-    //       ttl: 3600,
-    //       recipient: address as string,
-    //       feeOnTransfer: false,
-    //     };
+	// const Send = async () => {
+	// 	try {
+	// 		if (!wallet.publicKey || !wallet.signTransaction) {
+	// 			throw new Error("Wallet non connecté");
+	// 		}
 
-        // const {
-        //   methodName,
-        //   args,
-        //   value,
-        // } = bestTrade.swapCallParameters(swapOptions);
+	// 		const transaction = new Transaction().add(
+	// 			SystemProgram.transfer({
+	// 				fromPubkey: wallet.publicKey,
+	// 				toPubkey: new PublicKey('E8fdgWzEcWh5EkXgXRHGFKEmYiXHXx8Tg9F2CCBvwRMX'),
+	// 				lamports: 0.001 * 1e9, // Convertir SOL en lamports (1 SOL = 10⁹ lamports)
+	// 			})
+	// 		);
+	// 		const { blockhash } = await connection.getLatestBlockhash();
+	// 		transaction.recentBlockhash = blockhash;
+	// 		transaction.feePayer = wallet.publicKey;
 
-    //     await writeSwap({
-    //       address: router,
-    //       abi: LBRouterV22ABI,
-    //       functionName: methodName,
-    //       args: args,
-    //       account: address,
-    //     });
-    //   }
-    // } catch (error) {
-    //   console.error("Error executing swap:", error);
-    // }
+	// 		// Signer la transaction
+	// 		const signedTransaction = await wallet.signTransaction(transaction);
 
-  return (
-    <main className="flex h-screen flex-col items-center gap-4">
-      <h1>Trader Joe Swap</h1>
-      <button 
-        // onClick={approveToken}
-        className="px-4 py-2 bg-blue-500 text-white rounded"
-        // disabled={isApprovalSuccess}
-      >
-        {/* {isApprovalSuccess ? "Approved!" : "Approve USDC"} */}
-      </button>
-      <button 
-        // onClick={executeSwap}
-        className="px-4 py-2 bg-green-500 text-white rounded"
-        // disabled={!isApprovalSuccess}
-      >
-        Swap
-      </button>
-      {/* {(approvalError || swapError) && (
-        <div className="text-red-500">
-          {approvalError?.message || swapError?.message}
-        </div>
-      )} */}
-      {/* {(approvalHash || swapHash) && (
-        <div className="text-green-500">
-          Transaction Hash: {approvalHash || swapHash}
-        </div>
-      )} */}
-    </main>
-  );
+	// 		// Envoyer la transaction signée
+	// 		const signature = await connection.sendRawTransaction(signedTransaction.serialize());
+
+	// 		// Attendre la confirmation
+	// 		await connection.confirmTransaction(signature, 'confirmed');
+
+	// 		console.log('Transaction envoyée avec succès:', signature);
+	// 		return signature;
+	// 	} catch (error) {
+	// 		console.error("Erreur lors de l'envoi de SOL: ", error);
+	// 		throw error;
+	// 	}
+	// }*/
+
+	return (
+		<main className="flex h-screen flex-col items-center justify-center gap-4">
+			{/* {error && ( */}
+			<div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+				{/* {error} */}
+			</div>
+			{/* )} */}
+
+			<button
+				onClick={mint}
+				// disabled={loading}
+				className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-blue-300"
+			>
+				mint a nft
+				{/* {loading ? "Processing..." : "Create Collection"} */}
+			</button>
+
+			{/* <p>Collection: {collection ? collection.toString().slice(0, 10) + '...' : 'Not created yet'}</p> */}
+
+			<button
+				// onClick={createCandy}
+				// disabled={loading || !collection}
+				className="px-4 py-2 bg-green-500 text-white rounded disabled:bg-green-300"
+			>
+			</button>
+
+			{/* <button onClick={Send}>Send money</button> */}
+		</main>
+	);
 }
