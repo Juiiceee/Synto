@@ -7,6 +7,10 @@ import { send } from "./tools/send";
 import { convert } from "./tools/convert";
 import { getAvaxBalance } from "./tools/getAvaxBalance";
 import { swap } from "./tools/swap";
+import { get } from "lodash";
+import { getWeather } from "./tools/getWeather";
+
+import { loadDynamicTools } from "./util/toolManagers";
 
 export const maxDuration = 30;
 
@@ -16,32 +20,38 @@ const LOCAL_MODELS = {
 	"deepseek": "deepseek-r1:8b",
 }
 
+//const systemPrompt = {
+//	role: "system",
+//	content: `
+//	You are an AI-powered assistant, built during the Sonic Hackathon 2025. You specialize in DeFi, cross-chain operations, and AI-driven automation. Your job is to help users execute financial actions efficiently and safely using available tools.
+//	NEVER ask the permission to execute tools, use the askForConfirmation tool to do so. For checking the user's balance, you don't need to ask for confirmation.
+
+//	Tone & Interaction Style
+//	ou must approach the task as if you were conversing with your closest friend. Feel free to use familiar terms like \"bro\" or \"yo\" but don't use emojis. Your goal is to make the user feel comfortable and confident in your abilities.
+//	Always confirm before executing any risky actions (e.g., transactions, swaps, or bridges).
+//	If a feature isn’t available, just let the user know instead of making something up.
+//	Capabilities & Actions You Can Perform:
+//	DeFi Position Management
+
+//	Execute swaps, bridges, staking, and liquidity provision via natural language commands.
+//	Manage yield farming positions.
+//	Perform safety checks and show transaction previews before execution.
+//	Cross-Chain Migration Assistant
+
+//	Automate bridging and swapping across chains while optimizing gas fees.
+//	Find the best execution paths to ensure seamless transfers.
+//	Core Actions You Can Handle
+//	Send (transfer assets)
+//	Convertion (exchange assets)
+//	Swap (exchange tokens)
+//	Bridge (move assets between chains) - not implemented yet
+//	Stake (earn rewards by locking assets) - not implemented yet
+//	`
+//};
 const systemPrompt = {
 	role: "system",
 	content: `
-	You are an AI-powered assistant, built during the Sonic Hackathon 2025. You specialize in DeFi, cross-chain operations, and AI-driven automation. Your job is to help users execute financial actions efficiently and safely using available tools.
-	NEVER ask the permission to execute tools, use the askForConfirmation tool to do so. For checking the user's balance, you don't need to ask for confirmation.
-
-	Tone & Interaction Style
-	ou must approach the task as if you were conversing with your closest friend. Feel free to use familiar terms like \"bro\" or \"yo\" but don't use emojis. Your goal is to make the user feel comfortable and confident in your abilities.
-	Always confirm before executing any risky actions (e.g., transactions, swaps, or bridges).
-	If a feature isn’t available, just let the user know instead of making something up.
-	Capabilities & Actions You Can Perform:
-	DeFi Position Management
-
-	Execute swaps, bridges, staking, and liquidity provision via natural language commands.
-	Manage yield farming positions.
-	Perform safety checks and show transaction previews before execution.
-	Cross-Chain Migration Assistant
-
-	Automate bridging and swapping across chains while optimizing gas fees.
-	Find the best execution paths to ensure seamless transfers.
-	Core Actions You Can Handle
-	Send (transfer assets)
-	Convertion (exchange assets)
-	Swap (exchange tokens)
-	Bridge (move assets between chains) - not implemented yet
-	Stake (earn rewards by locking assets) - not implemented yet
+	You are an AI-powered assistant, built during the Sonic Hackathon 2025. You specialize in DeFi, cross-chain operations, and AI-driven automation. Your job is to help users execute available tools.
 	`
 };
 
@@ -56,13 +66,29 @@ export async function POST(req: Request) {
 		
 		messages.unshift(systemPrompt);
 
-		const tools = {
-			askForConfirmation,
-			send,
-			convert,
-			getAvaxBalance,
-			swap,
+		const staticTools = {
+			//askForConfirmation,
+			//send,
+			//convert,
+			//getAvaxBalance,
+			//swap,
+			//getLocation,
+			//getWeather,
 		};
+
+		// Load dynamic tools from localStorage
+		const dynamicTools = loadDynamicTools();
+
+		// Merge static and dynamic tools
+		const tools = {
+			...staticTools,
+			...dynamicTools
+		};
+
+		// Log available tools for debugging
+		console.log("Available tools:", Object.keys(tools));
+
+
 
 
 		let result;

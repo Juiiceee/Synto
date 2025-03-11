@@ -1,17 +1,16 @@
 "use client";
 
 import useChatStore from "@/app/hooks/useChatStore";
-import { Attachment, ChatRequestOptions, generateId } from "ai";
+import { ChatRequestOptions, generateId } from "ai";
 import { Message, useChat } from "ai/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useRef } from "react";
+import React from "react";
 import { toast } from "sonner";
+import CardList from "./CardList";
 import ChatBottombar from "./chat-bottombar";
 import ChatList from "./chat-list";
 import ChatTopbar from "./chat-topbar";
-import { Card, CardContent } from "../ui/card";
-import CardList from "./CardList";
 
 export interface ChatProps {
 	id: string;
@@ -120,7 +119,7 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 				<div className="flex flex-col h-full w-full items-center gap-4 justify-center">
 
 					<Image
-						src="/soin.png"
+						src="/logoSynto.png"
 						alt="Synto Logo"
 						width={100}
 						height={100}

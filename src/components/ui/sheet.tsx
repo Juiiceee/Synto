@@ -7,7 +7,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 import { Button } from "./button"
-import { Cross, Sidebar, X } from "lucide-react"
+import { Cross, Plus, Sidebar, X } from "lucide-react"
 
 const Sheet = SheetPrimitive.Root
 
@@ -67,12 +67,9 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       {children}
-      <SheetPrimitive.Close className="absolute top-12 -right-20 rounded-sm ">
-        <Cross2Icon className="h-4 w-4" />
+      <SheetPrimitive.Close className="absolute top-11 -right-20 bg-primary text-primary-foreground p-4 rounded-sm ">
+        <Plus className="h-5 w-5 font-bold rotate-45" />
         <span className="sr-only">Close</span>
-				{/*<Button >
-					<X className="w-5 h-5" />
-				</Button>*/}
       </SheetPrimitive.Close>
     </SheetPrimitive.Content>
   </SheetPortal>
