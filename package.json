@@ -20,6 +20,7 @@
     "@langchain/community": "^0.3.28",
     "@langchain/core": "^0.3.37",
     "@lordicon/react": "^1.10.1",
+    "@monaco-editor/react": "^4.7.0",
     "@mui/material": "^6.4.2",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-avatar": "^1.1.2",

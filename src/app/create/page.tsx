@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, Plus, Trash2, Save, Edit } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import pinata from "@/providers/pinata";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import MonacoEditor from "@monaco-editor/react";
 import {
 	Select,
 	SelectContent,
@@ -41,6 +43,7 @@ interface Tool {
 	parameters: Parameter[];
 	executionCode: string;
 	nftPrice: string;
+	imageUrl: string;
 }
 
 export const syncToolsToServer = async () => {
@@ -77,6 +80,8 @@ export default function ToolBuilder() {
 	const [parameters, setParameters] = useState<Parameter[]>([]);
 	const [executionCode, setExecutionCode] = useState("async ({ }) => {\n  // Your code here\n  \n}");
 	const [nftPrice, setNftPrice] = useState("0.1");
+	const [picture, setPicture] = useState<File | null>(null);
+	const [pictureUrl, setPictureUrl] = useState("");
 
 	// Load tools from localStorage on component mount
 	useEffect(() => {
@@ -101,6 +106,7 @@ export default function ToolBuilder() {
 				setExecutionCode(tool.executionCode);
 				setNftPrice(tool.nftPrice);
 				setIsEditing(true);
+				setPictureUrl(tool.imageUrl);
 			}
 		} else {
 			resetForm();
@@ -143,11 +149,19 @@ export default function ToolBuilder() {
 		setParameters(updatedParameters);
 	};
 
-	const saveTool = () => {
+	const saveTool = async () => {
 		// Basic validation
 		if (!toolName.trim()) {
 			toast.error("Tool name is required");
 			return;
+		}
+		let pictureUrlIpfs = pictureUrl;
+
+		if (picture) {
+			const upload = await pinata.upload.public.file(picture).group("567b36f7-3a34-49f3-a215-039e02340bb4");
+			console.log("https://plum-accurate-bobcat-724.mypinata.cloud/ipfs/" + upload.cid);
+			setPictureUrl("https://plum-accurate-bobcat-724.mypinata.cloud/ipfs/" + upload.cid);
+			pictureUrlIpfs = "https://plum-accurate-bobcat-724.mypinata.cloud/ipfs/" + upload.cid;
 		}
 
 		const newTool: Tool = {
@@ -157,6 +171,7 @@ export default function ToolBuilder() {
 			parameters,
 			executionCode,
 			nftPrice,
+			imageUrl: pictureUrlIpfs,
 		};
 
 		let updatedTools: Tool[];
@@ -177,6 +192,8 @@ export default function ToolBuilder() {
 		setTools(updatedTools);
 		localStorage.setItem("synto-tools", JSON.stringify(updatedTools));
 
+		const oui = await pinata.upload.public.json(newTool).group("567b36f7-3a34-49f3-a215-039e02340bb4");
+		console.log("https://plum-accurate-bobcat-724.mypinata.cloud/ipfs/" + oui.cid);
 		// Sync tools to server
 		syncToolsToServer();
 
@@ -298,7 +315,7 @@ export default function ToolBuilder() {
 									{/* Tool picture */}
 									<div className="space-y-2">
 										<Label htmlFor="picture">Picture</Label>
-										<Input id="picture" type="file" />
+										<Input id="picture" type="file" onChange={(e) => setPicture(e.target.files?.[0] || null)} accept="image/*" />
 									</div>
 
 
@@ -403,11 +420,13 @@ export default function ToolBuilder() {
 									<div className="space-y-2">
 										<Label htmlFor="execution-code">Function Code</Label>
 										<div className="relative">
-											<Textarea
-												id="execution-code"
-												value={executionCode}
-												onChange={(e) => setExecutionCode(e.target.value)}
+											<MonacoEditor
+												height="300px"
+												defaultLanguage="typescript"
+												defaultValue={executionCode}
+												onChange={(value) => setExecutionCode(value || "")}
 												className="font-mono bg-background min-h-60 p-4"
+												theme="vs-dark"
 											/>
 										</div>
 									</div>
