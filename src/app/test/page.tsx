@@ -6,7 +6,6 @@ import { toast } from "sonner"
 import { AnchorProvider, Program, setProvider, BN } from "@coral-xyz/anchor";
 import { MintPay } from "@/../mintPay/target/types/mint_pay";
 import idl from "@/../mintPay/target/idl/mint_pay.json";
-import { MPL_CORE_PROGRAM_ID } from "@metaplex-foundation/mpl-core";
 // import { PublicKey } from '@metaplex-foundation/umi';
 import { Connection, Keypair, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction } from "@solana/web3.js";
 
