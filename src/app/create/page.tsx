@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Parameter {
 	name: string;
@@ -69,6 +70,7 @@ export default function ToolBuilder() {
 	const [tools, setTools] = useState<Tool[]>([]);
 	const [currentToolId, setCurrentToolId] = useState<string | null>(null);
 	const [isEditing, setIsEditing] = useState(false);
+	const router = useRouter();
 
 	const [toolName, setToolName] = useState("");
 	const [toolDescription, setToolDescription] = useState("");
@@ -209,7 +211,7 @@ export default function ToolBuilder() {
 		<div className="min-h-screen bg-background">
 			<header className="border-b border-border p-4">
 				<div className="container flex items-center">
-					<Button variant="ghost" size="icon" className="mr-2">
+					<Button variant="ghost" size="icon" className="mr-2" onClick={() => router.back()}>
 						<ChevronLeft className="h-5 w-5" />
 					</Button>
 					<h1 className="text-xl font-bold">
