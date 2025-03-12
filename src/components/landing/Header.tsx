@@ -1,13 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, Hexagon } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useMediaQuery } from "@mui/material";
-import NavLinkMobile from "./NavLinkMobile";
-import Image from "next/image";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import NavLinkMobile from "./NavLinkMobile";
 
 // Import dynamically with no SSR
 const WalletMultiButton = dynamic(
@@ -43,7 +42,7 @@ const Header = () => {
 				<a href="/" className="flex items-center space-x-4">
 					<div className="flex items-center space-x-4">
 						<Image
-							src="/soin.png"
+							src="/logoSynto.png"
 							alt="Synto Logo"
 							width={36}
 							height={36}

@@ -40,7 +40,7 @@ function SendResultDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button size="sm">
+        <Button size="sm" className="rounded-sm">
           Show details
         </Button>
       </DialogTrigger>

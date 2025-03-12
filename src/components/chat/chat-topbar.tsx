@@ -1,25 +1,25 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 
 import {
-	Sheet,
-	SheetContent,
-	SheetTrigger,
+  Sheet,
+  SheetContent,
+  SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { Plus, Sidebar as SidebarIcon, SquarePen } from "lucide-react";
-import { Sidebar } from "../sidebar";
-import { Message } from "ai/react";
 import useChatStore from "@/app/hooks/useChatStore";
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Message } from "ai/react";
+import { Plus, Sidebar as SidebarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Sidebar } from "../sidebar";
 // import { ConnectButton } from "@rainbow-me/rainbowkit";
-import Image from "next/image";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import Image from "next/image";
 interface ChatTopbarProps {
 	isLoading: boolean;
 	chatId?: string;
@@ -71,7 +71,7 @@ export default function ChatTopbar({
 					className="py-2 cursor-pointer hover:bg-secondary rounded-lg"
 				>
 					<Image 
-						src="/soin.png"
+						src="/logoSynto.png"
 						alt="logo"
 						width={40}
 						height={40}
