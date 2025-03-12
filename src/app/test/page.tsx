@@ -33,14 +33,15 @@ export default function Test() {
 				[Buffer.from("collection"), wallet.publicKey.toBuffer()],
 				program.programId
 			);
-			console.log("\nCollection address: ", collectionAccount.toBase58());
+			const collectionData = await program.account.collection.fetch(collectionAccount);
+			console.log("\nCollection address: ", collectionData.owner.toBase58());
 			console.log("\nAsset address: ", asset.publicKey.toBase58());
 			const tx = await program.methods
 				.initializeMint("salut", "htpps://feur.com")
 				.accountsStrict({
 					user: wallet.publicKey,
 					mint: asset.publicKey,
-					collection: collectionAccount,
+					collection: new PublicKey(collectionData.owner),
 					systemProgram: SystemProgram.programId,
 					mplCoreProgram: new PublicKey("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")
 				})
