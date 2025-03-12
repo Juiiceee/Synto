@@ -2,7 +2,7 @@
 
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
 import { useState } from 'react';
-import { toast } from "react-hot-toast";
+import { toast } from "sonner"
 import { AnchorProvider, Program, setProvider, BN } from "@coral-xyz/anchor";
 import { MintPay } from "@/../mintPay/target/types/mint_pay";
 import idl from "@/../mintPay/target/idl/mint_pay.json";
@@ -36,8 +36,10 @@ export default function Test() {
 			const collectionData = await program.account.collection.fetch(collectionAccount);
 			console.log("\nCollection address: ", collectionData.owner.toBase58());
 			console.log("\nAsset address: ", asset.publicKey.toBase58());
-			const tx = await program.methods
-				.initializeMint("salut", "htpps://feur.com")
+
+			// Create the transaction promise
+			const txPromise = program.methods
+				.initializeMint("Soso", "htpps://caca.com")
 				.accountsStrict({
 					user: wallet.publicKey,
 					mint: asset.publicKey,
@@ -48,11 +50,18 @@ export default function Test() {
 				.signers([asset])
 				.rpc();
 
+			// Use toast.promise with the promise, not the result
+			toast.promise(txPromise, {
+				loading: "Initializing mint...",
+				success: `Mint initialized successfully!\nAsset address: ${asset.publicKey.toBase58()}`,
+			});
+
+			// Wait for the transaction to complete and get the signature
+			const tx = await txPromise;
 			console.log(`Transaction signature: ${tx}`);
-			toast.success(`Artist registered successfully!: ${tx}`);
 		} catch (error: any) {
-			console.error("Error initializing musician:", error);
-			toast.error(`Failed to register artist: ${error.message}`);
+			console.error("Error initializing mint:", error);
+			toast.error(`Failed to initialize mint: ${error.message}`);
 		}
 	}
 
@@ -63,7 +72,7 @@ export default function Test() {
 				[Buffer.from("collection"), wallet.publicKey.toBuffer()],
 				program.programId
 			);
-			
+
 			// Essayer de récupérer le compte
 			const collectionData = await program.account.collection.fetch(collectionAccount);
 			console.log("Collection already initialized:", collectionData.owner.toBase58());
@@ -79,13 +88,13 @@ export default function Test() {
 			const [collectionAccount] = PublicKey.findProgramAddressSync(
 				[Buffer.from("collection"), wallet.publicKey.toBuffer()],
 				program.programId
-			);			const collection = Keypair.generate();
+			); const collection = Keypair.generate();
 			console.log("\nCollection address: ", collectionAccount.toBase58());
-			const tx = await program.methods
+			const txPromise = program.methods
 				.initializeCollection("Zozo collection", "htpps://raphou.com")
 				.accountsStrict({
 					user: wallet.publicKey,
-					collectionAccount:collectionAccount,
+					collectionAccount: collectionAccount,
 					collection: collection.publicKey,
 					systemProgram: SystemProgram.programId,
 					mplCoreProgram: new PublicKey("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")
@@ -93,11 +102,15 @@ export default function Test() {
 				.signers([collection])
 				.rpc();
 
+			toast.promise(txPromise, {
+				loading: "Initializing collection...",
+				success: "Collection initialized successfully!"
+			});
+			const tx = await txPromise;
 			console.log(`Transaction signature: ${tx}`);
-			toast.success(`Collection registered successfully!: ${tx}`);
 		} catch (error: any) {
 			console.error("Error initializing collection:", error);
-			toast.error(`Failed to register collection: ${error.message}`);
+			toast.error(`Failed to initialize collection: ${error.message}`);
 		}
 	}
 

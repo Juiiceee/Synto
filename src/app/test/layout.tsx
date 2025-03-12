@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import "../globals.css";
 import Header from "@/components/landing/Header";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
 	children,
@@ -16,6 +17,7 @@ export default function RootLayout({
 			<button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => {router.push("/test/oui")}}>Oui</button>
 			<Header />
 			{children}
+			<Toaster />
 		</div>
 	);
 }
