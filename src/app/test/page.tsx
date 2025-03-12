@@ -13,25 +13,34 @@ import { Connection, Keypair, PublicKey, Transaction, SystemProgram, sendAndConf
 export default function Test() {
 	const wallet = useAnchorWallet();
 	const { connection } = useConnection();
+	if (!wallet) {
+		toast.error("Please connect your wallet");
+		return;
+	}
+	const provider = new AnchorProvider(connection, wallet, {
+		commitment: "confirmed",
+	});
+	setProvider(provider);
+	const program = new Program(idl as MintPay, provider);
 	const mint = async () => {
 		if (!wallet) {
 			toast.error("Please connect your wallet");
 			return;
 		}
 		try {
-			const provider = new AnchorProvider(connection, wallet, {
-				commitment: "confirmed",
-			});
-			setProvider(provider);
-			const program = new Program(idl as MintPay, provider);
 			const asset = Keypair.generate();
-
+			const [collectionAccount] = PublicKey.findProgramAddressSync(
+				[Buffer.from("collection"), wallet.publicKey.toBuffer()],
+				program.programId
+			);
+			console.log("\nCollection address: ", collectionAccount.toBase58());
 			console.log("\nAsset address: ", asset.publicKey.toBase58());
 			const tx = await program.methods
 				.initializeMint("salut", "htpps://feur.com")
 				.accountsStrict({
 					user: wallet.publicKey,
 					mint: asset.publicKey,
+					collection: collectionAccount,
 					systemProgram: SystemProgram.programId,
 					mplCoreProgram: new PublicKey("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")
 				})
@@ -45,105 +54,51 @@ export default function Test() {
 			toast.error(`Failed to register artist: ${error.message}`);
 		}
 	}
-	/*const [collection, setCollection] = useState<PublicKey | null>(null)
-	const [loading, setLoading] = useState<boolean>(false)
-	const [error, setError] = useState<string | null>(null)
-	const connection = new Connection("https://api.testnet.sonic.game", "confirmed");
-	// Create UMI instance with all necessary plugins
-	const umi = createUmi('https://api.devnet.solana.com')
-		.use(mplCandyMachine())
-		.use(walletAdapterIdentity(wallet))
-		.use(mplCore()).use(mplTokenMetadata())
+
+	const checkCollection = async () => {
+		try {
+			// Récupérer l'adresse du compte collection
+			const [collectionAccount] = PublicKey.findProgramAddressSync(
+				[Buffer.from("collection"), wallet.publicKey.toBuffer()],
+				program.programId
+			);
+			
+			// Essayer de récupérer le compte
+			const collectionData = await program.account.collection.fetch(collectionAccount);
+			console.log("Collection already initialized:", collectionData.owner.toBase58());
+			return true;
+		} catch (error) {
+			console.log("Collection not initialized yet:", error.message);
+			return false;
+		}
+	}
 
 	const createCol = async () => {
 		try {
-			setLoading(true);
-			setError(null);
+			const [collectionAccount] = PublicKey.findProgramAddressSync(
+				[Buffer.from("collection"), wallet.publicKey.toBuffer()],
+				program.programId
+			);			const collection = Keypair.generate();
+			console.log("\nCollection address: ", collectionAccount.toBase58());
+			const tx = await program.methods
+				.initializeCollection("Zozo collection", "htpps://raphou.com")
+				.accountsStrict({
+					user: wallet.publicKey,
+					collectionAccount:collectionAccount,
+					collection: collection.publicKey,
+					systemProgram: SystemProgram.programId,
+					mplCoreProgram: new PublicKey("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")
+				})
+				.signers([collection])
+				.rpc();
 
-			const collectionSigner = generateSigner(umi);
-
-			console.log("Creating collection...");
-			const tx = createCollection(umi, {
-				collection: collectionSigner,
-				name: 'My Collection',
-				uri: 'https://example.com/my-collection.json',
-			});
-
-			await tx.sendAndConfirm(umi);
-			setCollection(new PublicKey(collectionSigner.publicKey));
-			console.log("Collection created: " + collectionSigner.publicKey.toString());
-		} catch (err) {
-			console.error("Error creating collection:", err);
-			setError(err instanceof Error ? err.message : String(err));
-		} finally {
-			setLoading(false);
+			console.log(`Transaction signature: ${tx}`);
+			toast.success(`Collection registered successfully!: ${tx}`);
+		} catch (error: any) {
+			console.error("Error initializing collection:", error);
+			toast.error(`Failed to register collection: ${error.message}`);
 		}
 	}
-
-	const createCandy = async () => {
-		try {
-			setLoading(true);
-			setError(null);
-
-			if (!collection) {
-				throw new Error("Please create a collection first");
-			}
-
-			const candyMachine = generateSigner(umi);
-
-			console.log("Creating candy machine...", candyMachine.publicKey.toString());
-			const createIx = await create(umi, {
-				candyMachine,
-				collection: collection,
-				collectionUpdateAuthority: umi.identity,
-				itemsAvailable: 1000,
-				authority: umi.identity.publicKey,
-				isMutable: true,
-			});
-
-			await createIx.sendAndConfirm(umi);
-			console.log("Candy Machine created: " + candyMachine.publicKey.toString());
-		} catch (err) {
-			console.error("Error creating candy machine:", err);
-			setError(err instanceof Error ? err.message : String(err));
-		} finally {
-			setLoading(false);
-		}
-	}
-
-	// const Send = async () => {
-	// 	try {
-	// 		if (!wallet.publicKey || !wallet.signTransaction) {
-	// 			throw new Error("Wallet non connecté");
-	// 		}
-
-	// 		const transaction = new Transaction().add(
-	// 			SystemProgram.transfer({
-	// 				fromPubkey: wallet.publicKey,
-	// 				toPubkey: new PublicKey('E8fdgWzEcWh5EkXgXRHGFKEmYiXHXx8Tg9F2CCBvwRMX'),
-	// 				lamports: 0.001 * 1e9, // Convertir SOL en lamports (1 SOL = 10⁹ lamports)
-	// 			})
-	// 		);
-	// 		const { blockhash } = await connection.getLatestBlockhash();
-	// 		transaction.recentBlockhash = blockhash;
-	// 		transaction.feePayer = wallet.publicKey;
-
-	// 		// Signer la transaction
-	// 		const signedTransaction = await wallet.signTransaction(transaction);
-
-	// 		// Envoyer la transaction signée
-	// 		const signature = await connection.sendRawTransaction(signedTransaction.serialize());
-
-	// 		// Attendre la confirmation
-	// 		await connection.confirmTransaction(signature, 'confirmed');
-
-	// 		console.log('Transaction envoyée avec succès:', signature);
-	// 		return signature;
-	// 	} catch (error) {
-	// 		console.error("Erreur lors de l'envoi de SOL: ", error);
-	// 		throw error;
-	// 	}
-	// }*/
 
 	return (
 		<main className="flex h-screen flex-col items-center justify-center gap-4">
@@ -165,10 +120,17 @@ export default function Test() {
 			{/* <p>Collection: {collection ? collection.toString().slice(0, 10) + '...' : 'Not created yet'}</p> */}
 
 			<button
-				// onClick={createCandy}
+				onClick={createCol}
 				// disabled={loading || !collection}
 				className="px-4 py-2 bg-green-500 text-white rounded disabled:bg-green-300"
 			>
+				create collection
+			</button>
+			<button
+				onClick={checkCollection}
+				className="px-4 py-2 bg-green-500 text-white rounded disabled:bg-green-300"
+			>
+				check collection
 			</button>
 
 			{/* <button onClick={Send}>Send money</button> */}
