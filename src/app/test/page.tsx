@@ -11,6 +11,7 @@ import { Connection, Keypair, PublicKey, Transaction, SystemProgram, sendAndConf
 
 export default function Test() {
 	const wallet = useAnchorWallet();
+	const [price, setPrice] = useState(0);
 	const { connection } = useConnection();
 	if (!wallet) {
 		toast.error("Please connect your wallet");
@@ -82,15 +83,30 @@ export default function Test() {
 		}
 	}
 
+	const checkCollectionAccount = async () => {
+		const [collectionAccount] = PublicKey.findProgramAddressSync(
+			[Buffer.from("collection"), wallet.publicKey.toBuffer()],
+			program.programId
+		);
+		try {
+			const collectionData = await program.account.collection.fetch(collectionAccount);
+			// console.log("collection:", collectionData.price.toString());
+			console.log("Collection:\n AdressCollection: ", collectionData.owner.toBase58(), "\n Price: ", collectionData.price.toString());
+		} catch (error) {
+			console.log("Collection not initialized yet:", error.message);
+		}
+	}
+
 	const createCol = async () => {
 		try {
 			const [collectionAccount] = PublicKey.findProgramAddressSync(
 				[Buffer.from("collection"), wallet.publicKey.toBuffer()],
 				program.programId
-			); const collection = Keypair.generate();
+			);
+			const collection = Keypair.generate();
 			console.log("\nCollection address: ", collectionAccount.toBase58());
 			const txPromise = program.methods
-				.initializeCollection("Zozo collection", "htpps://raphou.com")
+				.initializeCollection("Zozo collection", "htpps://raphou.com", new BN(price))
 				.accountsStrict({
 					user: wallet.publicKey,
 					collectionAccount: collectionAccount,
@@ -145,6 +161,13 @@ export default function Test() {
 			>
 				check collection
 			</button>
+			<button
+				onClick={checkCollectionAccount}
+				className="px-4 py-2 bg-green-500 text-white rounded disabled:bg-green-300"
+			>
+				check collection account
+			</button>
+			<input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} />
 
 			{/* <button onClick={Send}>Send money</button> */}
 		</main>
