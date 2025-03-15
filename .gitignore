@@ -3,6 +3,8 @@
 pinata.tsx
 counter.ts
 counter.json
+collection.json
+data.json
 
 package-lock.json
 pnpm-lock.yaml
