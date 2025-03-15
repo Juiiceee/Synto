@@ -40,14 +40,20 @@ export default function Test() {
 			console.log("\nAsset address: ", asset.publicKey.toBase58());
 
 			// Create the transaction promise
+			const [adminPDA] = PublicKey.findProgramAddressSync(
+				[Buffer.from("admin")],
+				program.programId
+			);
+			
 			const txPromise = program.methods
 				.initializeMint()
-				.accountsStrict({
+				.accounts({
 					user: wallet.publicKey,
-					recipient: new PublicKey(publicKey),
+					recipient: new PublicKey(publicKey),  // Pour future utilisation
 					mint: asset.publicKey,
 					collection: collectionAccount,
-					metaplex_collection: collectionData.collectionAddress,
+					metaplexCollection: collectionData.collectionAddress,
+					admin: adminPDA,  // PDA admin pour signer
 					systemProgram: SystemProgram.programId,
 					mplCoreProgram: new PublicKey("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")
 				})
@@ -86,6 +92,27 @@ export default function Test() {
 			return false;
 		}
 	}
+
+	const testIds = async () => {
+		const txPromise = program.methods
+			.testIds()
+			.accounts({
+				user: wallet.publicKey,
+				systemProgram: SystemProgram.programId,
+				mplCoreProgram: new PublicKey("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")
+			})
+			.rpc();
+
+			// Show toast for the transaction
+			toast.promise(txPromise, {
+				loading: "Testing IDs...",
+				success: "IDs tested successfully!",
+				error: "Failed to test IDs"
+			});
+			
+			const tx = await txPromise;
+			console.log(`Transaction signature: ${tx}`);
+		}
 
 	const checkCollectionAccount = async () => {
 		const [collectionAccount] = PublicKey.findProgramAddressSync(
@@ -179,6 +206,13 @@ export default function Test() {
 				>
 					mint a nft
 					{/* {loading ? "Processing..." : "Create Collection"} */}
+				</button>
+
+				<button
+					onClick={testIds}
+					className="px-4 py-2 bg-green-500 text-white rounded disabled:bg-green-300"
+				>
+					test ids
 				</button>
 
 				<p>Collection: {collectionPublicKey ? collectionPublicKey.slice(0, 10) + '...' : 'Not created yet'}</p>
