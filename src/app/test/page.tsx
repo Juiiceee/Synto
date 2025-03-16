@@ -38,18 +38,11 @@ export default function Test() {
 	const wallet = useAnchorWallet();
 	const [nameCollection, setNameCollection] = useState("");
 	const [uriCollection, setUriCollection] = useState("");
-	const [nameAsset, setNameAsset] = useState("");
-	const [uriAsset, setUriAsset] = useState("");
+	const [nameAsset, setNameAsset] = useState("Token Listing");
+	const [creatorAsset, setCreatorAsset] = useState("JuijdHQrGSBo9MZ7CXppdBF4jKd9DbzpSLSGnrXHR7G");
 	const [nameTemplate, setNameTemplate] = useState("Token Listing");
-	const [descriptionTemplate, setDescriptionTemplate] = useState("Create a token listing to allow users to trade your tokens on decentralized exchanges. Specify parameters like token name, symbol, and initial supply.");
-	const [imageTemplate, setImageTemplate] = useState("https://plum-accurate-bobcat-724.mypinata.cloud/ipfs/bafkreiaqa27tnhodt5iwku4aim6xtf7qrj4ltcjt553bqkl3hks7ogntaa");
-	const [numberOfParameters, setNumberParameters] = useState<number>(1);
-	const [executionCode, setExecutionCode] = useState<string>("async ({ }) =\u003E {\n  // Your code here\n  \n}");
-	const [price, setPrice] = useState<BN>(new BN(1));
-	const [nameParameter, setNameParameter] = useState<string>("Token Name");
-	const [descriptionParameter, setDescriptionParameter] = useState<string>("Le nom du token");
-	const [required, setRequired] = useState<boolean>(true);
-	const [style, setStyle] = useState<string>("string");
+	const [uriTemplate, setUriTemplate] = useState("https://plum-accurate-bobcat-724.mypinata.cloud/ipfs/bafkreia5muahxphxht4vpuksbmskro5yhynlysbscd46bgpv5ziivb74me");
+	const [price, setPrice] = useState("");
 	const [collectionPublicKey, setCollectionPublicKey] = useState<string | null>(null);
 
 	const { connection } = useConnection();
@@ -67,14 +60,7 @@ export default function Test() {
 
 	const program = new Program(idl as MintPay, provider);
 
-	const getAdmin = (): PublicKey => {
-		const [admin] = PublicKey.findProgramAddressSync(
-			[Buffer.from("admin")],
-			program.programId
-		);
-		console.log("Admin address:", admin.toBase58());
-		return admin;
-	}
+
 
 	const createTemplate = async () => {
 		try {
@@ -87,32 +73,15 @@ export default function Test() {
 				program.programId
 			);
 
-			// Define the attribute object with proper field names
-			const attribut = {
-				numberOfParameters: numberOfParameters,
-				executionCode: executionCode,
-				price: new BN(price * 10**9)
-			};
-
-			// Define the parameter object
-			const parameter = {
-				nameParameter: nameParameter,
-				descriptionParameter: descriptionParameter,
-				required: required,
-				style: style
-			};
-
 			console.log("Sending transaction with data:", {
 				name: nameTemplate,
-				description: descriptionTemplate,
-				image: imageTemplate,
-				attribut,
-				parameter
+				uri: uriTemplate,
+				price: new BN(Number(price) * 10 ** 9)
 			});
 
 			// Call the program method with the correct parameters
 			const txPromise = program.methods
-				.createTemplate(nameTemplate, descriptionTemplate, imageTemplate, attribut, parameter)
+				.createTemplate(nameTemplate, uriTemplate, new BN(Number(price) * 10 ** 9))
 				.accounts({
 					user: wallet.publicKey,
 					template: templateAccount,
@@ -138,6 +107,17 @@ export default function Test() {
 	const checkTemplate = async () => {
 		const data = await program.account.template.all();
 		console.log("Templates:", data);
+		const [templatePda] = PublicKey.findProgramAddressSync(
+			[
+				Buffer.from("template"),
+				Buffer.from(nameTemplate),
+				new PublicKey(creatorAsset).toBuffer()
+			],
+			program.programId
+		);
+		console.log("Template address:", templatePda.toBase58());
+		const templateData = await program.account.template.fetch(templatePda) as any;
+		console.log("\nTemplate address:\nname: ", templateData.name, "\nuri: ", templateData.uri, "\nprice: ", templateData.price.toString(), "\ncreator: ", templateData.creator.toBase58());
 	}
 
 	const mint = async () => {
@@ -147,6 +127,16 @@ export default function Test() {
 				[Buffer.from("collection")],
 				program.programId
 			);
+
+			const [templatePda] = PublicKey.findProgramAddressSync(
+				[
+					Buffer.from("template"),
+					Buffer.from(nameTemplate),
+					new PublicKey(creatorAsset).toBuffer()
+				],
+				program.programId
+			);
+			console.log("\nTemplate address: ", templatePda.toBase58());
 			// Utiliser le type any pour éviter les erreurs de typage
 			const collectionData = await program.account.collection.fetch(collectionAccount) as any;
 			console.log("\nCollection address: ", collectionData.collectionAddress.toBase58());
@@ -156,12 +146,12 @@ export default function Test() {
 			const admin = getAdmin();
 
 			const txPromise = program.methods
-				.initializeMint(nameAsset, uriAsset)
+				.initializeMint()
 				.accounts({
 					user: wallet.publicKey,
 					recipient: new PublicKey("JuijdHQrGSBo9MZ7CXppdBF4jKd9DbzpSLSGnrXHR7G"),  // Pour future utilisation
 					mint: asset.publicKey,
-					collection: collectionAccount,
+					template: templatePda,
 					metaplexCollection: collectionData.collectionAddress,
 					admin: admin,  // PDA admin pour signer
 					systemProgram: SystemProgram.programId,
@@ -215,11 +205,6 @@ export default function Test() {
 
 	const createCol = async () => {
 		try {
-			if (await getCollectionAccount() !== null) {
-				toast.error("Collection already created :\n" + (await getCollectionAccount())?.collectionAddress.toBase58());
-				setCollectionPublicKey((await getCollectionAccount())?.collectionAddress.toBase58() ?? '');
-				return;
-			}
 			const [collectionAccount] = PublicKey.findProgramAddressSync(
 				[Buffer.from("collection")],
 				program.programId
@@ -285,23 +270,8 @@ export default function Test() {
 				</CardHeader>
 				<CardContent className="flex flex-col gap-4">
 					<Input type="text" value={nameTemplate} placeholder="Template name" onChange={(e) => setNameTemplate(e.target.value)} />
-					<Textarea 
-						value={descriptionTemplate}
-						placeholder="Template description"
-						onChange={(e) => setDescriptionTemplate(e.target.value)}
-						className="min-h-[100px]"
-					/>
-					<Input type="text" value={imageTemplate} placeholder="Template image" onChange={(e) => setImageTemplate(e.target.value)} />
-					<Label>Number of parameters</Label>
-					<Input type="number" value={numberOfParameters} placeholder="Number of parameters" onChange={(e) => setNumberParameters(Number(e.target.value))} />
-					<Input type="text" value={executionCode} placeholder="Execution code" onChange={(e) => setExecutionCode(e.target.value)} />
-					<Label>Price</Label>
-					<Input type="number" value={price} placeholder="Price" onChange={(e) => setPrice(new BN(Number(e.target.value)))} />
-					<Input type="text" value={nameParameter} placeholder="Parameter name" onChange={(e) => setNameParameter(e.target.value)} />
-					<Input type="text" value={descriptionParameter} placeholder="Parameter description" onChange={(e) => setDescriptionParameter(e.target.value)} />
-					<Label>Required</Label>
-					<Input type="checkbox" onChange={(e) => setRequired(e.target.checked)} />
-					<Input type="text" value={style} placeholder="Parameter style" onChange={(e) => setStyle(e.target.value)} />
+					<Input type="text" value={uriTemplate} placeholder="Template uri" onChange={(e) => setUriTemplate(e.target.value)} />
+					<Input type="text" value={price} placeholder="Price" onChange={(e) => setPrice(e.target.value)} />
 					<Button
 						onClick={createTemplate}
 						className="px-4 py-2 bg-green-500 text-white rounded disabled:bg-green-300"
@@ -322,7 +292,7 @@ export default function Test() {
 				check template</button>
 
 			<input type="text" value={nameAsset} placeholder="Asset name" onChange={(e) => setNameAsset(e.target.value)} />
-			<input type="text" value={uriAsset} placeholder="Asset uri" onChange={(e) => setUriAsset(e.target.value)} />
+			<input type="text" value={creatorAsset} placeholder="Asset creator" onChange={(e) => setCreatorAsset(e.target.value)} />
 			<button
 				onClick={mint}
 				// disabled={loading}
