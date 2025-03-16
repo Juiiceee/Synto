@@ -40,14 +40,14 @@ function SubmitButton({
         <div className="absolute left-0 ml-4">
           <PlusIcon className="h-5" />
         </div>
-        Add To Wallet
+        Add to Agent
       </button>
     );
   }
 
   return (
     <button
-      aria-label="Add to wallet"
+      aria-label="Add to Agent"
       onClick={onClick}
       disabled={isAdding}
       type="button"
@@ -59,7 +59,7 @@ function SubmitButton({
       <div className="absolute left-0 ml-4">
         <PlusIcon className="h-5" />
       </div>
-      {isAdding ? 'Adding...' : 'Add To Wallet'}
+      {isAdding ? 'Adding...' : 'Add to Agent'}
     </button>
   );
 }

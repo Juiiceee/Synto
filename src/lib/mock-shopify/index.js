@@ -1,8 +1,7 @@
 // lib/mock-shopify/index.js
-import { cookies } from 'next/headers';
-import { 
-  products as mockProducts, 
-  collections as mockCollections, 
+import {
+  products as mockProducts,
+  collections as mockCollections,
   menus as mockMenus,
   pages as mockPages,
   getCart as getMockCart,
@@ -17,32 +16,33 @@ import { TAGS } from '../constants';
 // Helper function to simulate asynchronous behavior
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Reshaping functions similar to the original
-const reshapeProduct = (product) => {
-  if (!product) return undefined;
-  return {
-    ...product,
-    // Already in the right format in our mock data
-  };
+// Helper function to get cartId that works in both client and server
+const getCartId = () => {
+  // Client-side: check localStorage
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('cartId');
+  }
+
+  // Server-side: return null (we'll handle cart on client side)
+  return null;
 };
 
-const reshapeProducts = (products) => {
-  return products.map(product => reshapeProduct(product)).filter(Boolean);
-};
-
-const reshapeCollection = (collection) => {
-  if (!collection) return undefined;
-  return collection; // Already in the right format
-};
-
-const reshapeCollections = (collections) => {
-  return collections.map(collection => reshapeCollection(collection)).filter(Boolean);
+// Helper function to set cartId that works in both client and server
+const setCartId = (id) => {
+  // Client-side: save to localStorage
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('cartId', id);
+  }
 };
 
 // Implement the same interface as the original shopify.js
 export async function createCart() {
   await delay(100); // Simulate network latency
-  return createMockCart();
+  const cart = createMockCart();
+  if (cart.id) {
+    setCartId(cart.id);
+  }
+  return cart;
 }
 
 export async function addToCart(lines) {
@@ -62,7 +62,7 @@ export async function updateCart(lines) {
 
 export async function getCart() {
   await delay(100);
-  const cartId = (await cookies()).get('cartId')?.value;
+  const cartId = getCartId();
   if (!cartId) {
     return undefined;
   }
@@ -70,29 +70,25 @@ export async function getCart() {
 }
 
 export async function getCollection(handle) {
-  // Cache tag for collection data
-  
   await delay(100);
   return mockCollections.find(collection => collection.handle === handle);
 }
 
-export async function getCollectionProducts({ 
-  collection, 
-  reverse = false, 
-  sortKey = 'RELEVANCE' 
+export async function getCollectionProducts({
+  collection,
+  reverse = false,
+  sortKey = 'RELEVANCE'
 }) {
-  // Cache tags for collections and products
-  
   await delay(100);
-  
+
   // Filter products based on collection
   let filteredProducts = [...mockProducts];
-  
+
   if (collection && collection !== 'all') {
     // You'll need to implement logic to filter products by collection
     // For now, we'll just return all products
   }
-  
+
   // Sort products (simplified)
   if (sortKey === 'PRICE') {
     filteredProducts.sort((a, b) => {
@@ -108,15 +104,13 @@ export async function getCollectionProducts({
       return reverse ? dateB - dateA : dateA - dateB;
     });
   }
-  
+
   return filteredProducts;
 }
 
 export async function getCollections() {
-  // Cache tag for collections
-  
   await delay(100);
-  
+
   // Add "All" option like in the original code
   const allCollection = {
     handle: '',
@@ -129,13 +123,11 @@ export async function getCollections() {
     path: '/shop/search',
     updatedAt: new Date().toISOString()
   };
-  
+
   return [allCollection, ...mockCollections];
 }
 
 export async function getMenu(handle) {
-  // Cache tag for collections (menus are cached with collections in original code)
-  
   await delay(100);
   return mockMenus[handle] || [];
 }
@@ -151,15 +143,11 @@ export async function getPages() {
 }
 
 export async function getProduct(handle) {
-  // Cache tag for products
-  
   await delay(100);
   return mockProducts.find(product => product.handle === handle);
 }
 
 export async function getProductRecommendations(productId) {
-  // Cache tag for products
-  
   await delay(100);
   // Return 2 random products as recommendations
   const otherProducts = mockProducts.filter(p => p.id !== productId);
@@ -172,21 +160,19 @@ export async function getProducts({
   reverse,
   sortKey
 }) {
-  // Cache tag for products
-  
   await delay(100);
-  
+
   let filteredProducts = [...mockProducts];
-  
+
   // Basic search implementation
   if (query) {
     const lowercaseQuery = query.toLowerCase();
-    filteredProducts = filteredProducts.filter(product => 
-      product.title.toLowerCase().includes(lowercaseQuery) || 
+    filteredProducts = filteredProducts.filter(product =>
+      product.title.toLowerCase().includes(lowercaseQuery) ||
       product.description.toLowerCase().includes(lowercaseQuery)
     );
   }
-  
+
   // Sorting (simplified)
   if (sortKey === 'PRICE') {
     filteredProducts.sort((a, b) => {
@@ -201,7 +187,7 @@ export async function getProducts({
       return reverse ? dateB - dateA : dateA - dateB;
     });
   }
-  
+
   return filteredProducts;
 }
 

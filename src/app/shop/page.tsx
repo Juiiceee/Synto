@@ -4,17 +4,20 @@ import Footer from '@/components/layout/footer';
 
 export const metadata = {
   description:
-    'High-performance ecommerce store built with Next.js, Vercel, and Shopify.',
+    'Explore and acquire AI tools for Sonic DeFi operations.',
   openGraph: {
     type: 'website'
   }
 };
 
-export default function HomePage() {
+export default function ShopPage() {
   return (
     <>
-      <ThreeItemGrid />
-      <Carousel />
+      <div className="mx-auto max-w-(--breakpoint-2xl)">
+        <h1 className="text-3xl font-bold mb-8 text-center pt-6">Tool Marketplace</h1>
+        <ThreeItemGrid />
+        <Carousel />
+      </div>
       <Footer />
     </>
   );
