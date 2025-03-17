@@ -1,8 +1,8 @@
-import Header from '@/components/landing/Header'
-import LandingPage from '@/components/landing/LandingPage'
+"use client";
 import React from 'react'
+import LandingPage from '@/components/landing/LandingPage'
 
-const landing = () => {
+const Landing = () => {
 	return (
 		<main className="flex h-screen flex-col items-center ">
 			<LandingPage />
@@ -10,4 +10,4 @@ const landing = () => {
 	)
 }
 
-export default landing
+export default Landing

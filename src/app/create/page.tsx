@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, Plus, Trash2, Save, Edit } from "lucide-react";
+import { ChevronLeft, Plus, Trash2, Save, Edit, ClipboardCopy } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import pinata from "@/providers/pinata";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MonacoEditor from "@monaco-editor/react";
+import { MintPay } from "@/../mintPay/target/types/mint_pay";
+import idl from "@/../mintPay/target/idl/mint_pay.json";
 import {
 	Select,
 	SelectContent,
@@ -27,6 +29,9 @@ import {
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
+import { AnchorProvider, BN, Program, setProvider } from "@coral-xyz/anchor";
 
 interface Attribute {
 	trait_type: string;
@@ -85,6 +90,7 @@ export default function ToolBuilder() {
 	const [tools, setTools] = useState<Tool[]>([]);
 	const [currentToolId, setCurrentToolId] = useState<string | null>(null);
 	const [isEditing, setIsEditing] = useState(false);
+	const [canUpload, setCanUpload] = useState(false);
 	const router = useRouter();
 
 	const [toolName, setToolName] = useState("");
@@ -94,10 +100,15 @@ export default function ToolBuilder() {
 	const [nftPrice, setNftPrice] = useState("0.1");
 	const [picture, setPicture] = useState<File | null>(null);
 	const [pictureUrl, setPictureUrl] = useState("");
+	const [url, setUrl] = useState("");
 
 	// Load tools from localStorage on component mount
 	useEffect(() => {
 		const savedTools = localStorage.getItem("synto-tools");
+		const savedUrl = localStorage.getItem("synto-url");
+		if (savedUrl) {
+			setUrl(savedUrl);
+		}
 		if (savedTools) {
 			try {
 				setTools(JSON.parse(savedTools));
@@ -224,8 +235,11 @@ export default function ToolBuilder() {
 
 		setTools(updatedTools);
 		localStorage.setItem("synto-tools", JSON.stringify(updatedTools));
-
+		
 		const oui = await pinata.upload.public.json(uploadTool).group("567b36f7-3a34-49f3-a215-039e02340bb4");
+		localStorage.setItem("synto-url", oui.cid);
+		setUrl(oui.cid);
+		
 		console.log("https://plum-accurate-bobcat-724.mypinata.cloud/ipfs/" + oui.cid);
 		// Sync tools to server
 		syncToolsToServer();
@@ -256,6 +270,61 @@ export default function ToolBuilder() {
 
 		toast("The tool has been deleted successfully.");
 	};
+
+	const wallet = useAnchorWallet();
+	const { connection } = useConnection();
+	if (!wallet) {
+		toast.error("Please connect your wallet");
+		return;
+	}
+
+	const provider = new AnchorProvider(connection, wallet, {
+		commitment: "confirmed",
+	});
+	setProvider(provider);
+	const program = new Program(idl as MintPay, provider);
+
+	const createTemplate = async () => {
+		try {
+			const [templateAccount] = PublicKey.findProgramAddressSync(
+				[
+					Buffer.from("template"),
+					Buffer.from(toolName),
+					wallet.publicKey.toBuffer()
+				],
+				program.programId
+			);
+
+			console.log("Sending transaction with data:", {
+				name: toolName,
+				uri: "https://plum-accurate-bobcat-724.mypinata.cloud/ipfs/" + url,
+				price: new BN(Number(nftPrice) * 10 ** 9)
+			});
+
+			// Call the program method with the correct parameters
+			const txPromise = program.methods
+				.createTemplate(toolName, "https://plum-accurate-bobcat-724.mypinata.cloud/ipfs/" + url, new BN(Number(nftPrice) * 10 ** 9))
+				.accounts({
+					user: wallet.publicKey,
+					template: templateAccount,
+					systemProgram: SystemProgram.programId,
+				})
+				.rpc();
+
+			// Show toast for the transaction
+			toast.promise(txPromise, {
+				loading: "Creating template...",
+				success: "Template created successfully!",
+				error: "Failed to create template"
+			});
+
+			const tx = await txPromise;
+			console.log(`Transaction signature: ${tx}`);
+		} catch (error: any) {
+			console.error("Error creating template:", error);
+			toast.error(`Failed to create template: ${error.message}`);
+		}
+	}
 
 	return (
 		<div className="min-h-screen bg-background">
@@ -478,6 +547,29 @@ export default function ToolBuilder() {
 										/>
 									</div>
 
+									<div className="space-y-2">
+										<Label htmlFor="json-url">Tool JSON URL</Label>
+										<div className="flex items-center gap-2">
+											<Input
+												id="json-url"
+												value={`https://plum-accurate-bobcat-724.mypinata.cloud/ipfs/${url || ''}`}
+												readOnly
+												className="bg-background flex-grow"
+											/>
+											<Button
+												variant="outline"
+												size="sm"
+												onClick={() => {
+													const urloui = `https://plum-accurate-bobcat-724.mypinata.cloud/ipfs/${url || ''}`;
+													navigator.clipboard.writeText(urloui);
+													toast("URL copied to clipboard");
+												}}
+											>
+												<ClipboardCopy className="h-4 w-4" />
+											</Button>
+										</div>
+									</div>
+
 									{/* Action buttons */}
 									<div className="flex justify-end space-x-4">
 										<Button
@@ -491,6 +583,12 @@ export default function ToolBuilder() {
 										>
 											<Save className="mr-2 h-4 w-4" />
 											{isEditing ? "Update Tool" : "Save Tool"}
+										</Button>
+										<Button
+											onClick={createTemplate}
+										>
+											<Save className="mr-2 h-4 w-4" />
+											Create Template
 										</Button>
 									</div>
 								</div>
