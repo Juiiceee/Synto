@@ -62,14 +62,14 @@ export const products = [
       },
     ],
     featuredImage: {
-      url: '/apes/1.jpeg',
+      url: '/nft/1.jpeg',
       altText: 'Sonic Sender Pro',
       width: 600,
       height: 400
     },
     images: [
       {
-        url: '/apes/1.jpeg',
+        url: '/nft/1.jpeg',
         altText: 'Sonic Sender Pro',
         width: 600,
         height: 400
@@ -143,14 +143,14 @@ export const products = [
       }
     ],
     featuredImage: {
-      url: '/apes/2.jpeg',
+      url: '/nft/2.jpeg',
       altText: 'Sonic Swap Genius',
       width: 600,
       height: 400
     },
     images: [
       {
-        url: '/apes/2.jpeg',
+        url: '/nft/2.jpeg',
         altText: 'Sonic Swap Genius',
         width: 600,
         height: 400
@@ -224,14 +224,14 @@ export const products = [
       }
     ],
     featuredImage: {
-      url: '/apes/3.jpeg',
+      url: '/nft/3.jpeg',
       altText: 'Contact Vault',
       width: 600,
       height: 400
     },
     images: [
       {
-        url: '/apes/3.jpeg',
+        url: '/nft/3.jpeg',
         altText: 'Contact Vault',
         width: 600,
         height: 400
@@ -305,14 +305,14 @@ export const products = [
       }
     ],
     featuredImage: {
-      url: '/apes/4.jpeg',
+      url: '/nft/4.jpeg',
       altText: 'Limit Hunter',
       width: 600,
       height: 400
     },
     images: [
       {
-        url: '/apes/4.jpeg',
+        url: '/nft/4.jpeg',
         altText: 'Limit Hunter',
         width: 600,
         height: 400
@@ -386,14 +386,14 @@ export const products = [
       }
     ],
     featuredImage: {
-      url: '/apes/5.jpeg',
+      url: '/nft/5.jpeg',
       altText: 'Yield Optimizer',
       width: 600,
       height: 400
     },
     images: [
       {
-        url: '/apes/5.jpeg',
+        url: '/nft/5.jpeg',
         altText: 'Yield Optimizer',
         width: 600,
         height: 400
@@ -469,14 +469,14 @@ export const products = [
       }
     ],
     featuredImage: {
-      url: '/apes/6.jpeg',
+      url: '/nft/6.jpeg',
       altText: 'Crypto Insights Pro',
       width: 600,
       height: 400
     },
     images: [
       {
-        url: '/apes/6.jpeg',
+        url: '/nft/6.jpeg',
         altText: 'Crypto Insights Pro',
         width: 600,
         height: 400
@@ -550,14 +550,14 @@ export const products = [
       }
     ],
     featuredImage: {
-      url: '/apes/7.jpeg',
+      url: '/nft/7.jpeg',
       altText: 'Portfolio Intelligence',
       width: 600,
       height: 400
     },
     images: [
       {
-        url: '/apes/7.jpeg',
+        url: '/nft/7.jpeg',
         altText: 'Portfolio Intelligence',
         width: 600,
         height: 400
@@ -631,14 +631,14 @@ export const products = [
       }
     ],
     featuredImage: {
-      url: '/apes/8.jpeg',
+      url: '/nft/8.jpeg',
       altText: 'DeFi Pulse',
       width: 600,
       height: 400
     },
     images: [
       {
-        url: '/apes/8.jpeg',
+        url: '/nft/8.jpeg',
         altText: 'DeFi Pulse',
         width: 600,
         height: 400
@@ -714,14 +714,14 @@ export const products = [
       }
     ],
     featuredImage: {
-      url: '/apes/9.jpeg',
+      url: '/nft/9.jpeg',
       altText: 'NFT Navigator',
       width: 600,
       height: 400
     },
     images: [
       {
-        url: '/apes/9.jpeg',
+        url: '/nft/9.jpeg',
         altText: 'NFT Navigator',
         width: 600,
         height: 400
@@ -795,14 +795,14 @@ export const products = [
       }
     ],
     featuredImage: {
-      url: '/apes/10.jpeg',
+      url: '/nft/10.jpeg',
       altText: 'Gas Optimizer',
       width: 600,
       height: 400
     },
     images: [
       {
-        url: '/apes/10.jpeg',
+        url: '/nft/10.jpeg',
         altText: 'Gas Optimizer',
         width: 600,
         height: 400
