@@ -28,16 +28,28 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-interface Parameter {
+interface Attribute {
+	trait_type: string;
+	value: string | number;
+  }
+  
+  interface Parameter {
 	name: string;
 	type: string;
 	description: string;
 	required: boolean;
-	validation?: string;
-}
+  }
+  
+  interface TemplateData {
+	name: string;
+	description: string;
+	image: string;
+	attributes: Attribute[];
+	parameters: Parameter[];
+  }
 
 interface Tool {
-	id: string;
+	id?: string;
 	name: string;
 	description: string;
 	parameters: Parameter[];
@@ -174,6 +186,27 @@ export default function ToolBuilder() {
 			imageUrl: pictureUrlIpfs,
 		};
 
+		const uploadTool: TemplateData = {
+			name: toolName,
+			description: toolDescription,
+			image: pictureUrlIpfs,
+			attributes: [
+				{
+					trait_type: "number of parameters",
+					value: parameters.length
+				},
+				{
+					trait_type: "execution code",
+					value: executionCode
+				},
+				{
+					trait_type: "price (sol)",
+					value: nftPrice
+				}
+			],
+			parameters: parameters,
+		};
+
 		let updatedTools: Tool[];
 
 		if (isEditing) {
@@ -192,7 +225,7 @@ export default function ToolBuilder() {
 		setTools(updatedTools);
 		localStorage.setItem("synto-tools", JSON.stringify(updatedTools));
 
-		const oui = await pinata.upload.public.json(newTool).group("567b36f7-3a34-49f3-a215-039e02340bb4");
+		const oui = await pinata.upload.public.json(uploadTool).group("567b36f7-3a34-49f3-a215-039e02340bb4");
 		console.log("https://plum-accurate-bobcat-724.mypinata.cloud/ipfs/" + oui.cid);
 		// Sync tools to server
 		syncToolsToServer();

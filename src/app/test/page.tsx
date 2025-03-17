@@ -120,73 +120,6 @@ export default function Test() {
 		console.log("\nTemplate address:\nname: ", templateData.name, "\nuri: ", templateData.uri, "\nprice: ", templateData.price.toString(), "\ncreator: ", templateData.creator.toBase58());
 	}
 
-	const mint = async () => {
-		try {
-			const asset = Keypair.generate();
-			const [collectionAccount] = PublicKey.findProgramAddressSync(
-				[Buffer.from("collection")],
-				program.programId
-			);
-
-			const [templatePda] = PublicKey.findProgramAddressSync(
-				[
-					Buffer.from("template"),
-					Buffer.from(nameTemplate),
-					new PublicKey(creatorAsset).toBuffer()
-				],
-				program.programId
-			);
-			console.log("\nTemplate address: ", templatePda.toBase58());
-			// Utiliser le type any pour éviter les erreurs de typage
-			const collectionData = await program.account.collection.fetch(collectionAccount) as any;
-			console.log("\nCollection address: ", collectionData.collectionAddress.toBase58());
-			console.log("\nAsset address: ", asset.publicKey.toBase58());
-
-			// Create the transaction promise
-			const admin = getAdmin();
-
-			const txPromise = program.methods
-				.initializeMint()
-				.accounts({
-					user: wallet.publicKey,
-					recipient: new PublicKey("JuijdHQrGSBo9MZ7CXppdBF4jKd9DbzpSLSGnrXHR7G"),  // Pour future utilisation
-					mint: asset.publicKey,
-					template: templatePda,
-					metaplexCollection: collectionData.collectionAddress,
-					admin: admin,  // PDA admin pour signer
-					systemProgram: SystemProgram.programId,
-					mplCoreProgram: mplCoreID
-				})
-				.signers([asset])
-				.rpc();
-
-			// Show toast for the transaction
-			toast.promise(txPromise, {
-				loading: "Minting NFT...",
-				success: "NFT minted successfully!",
-				error: "Failed to mint NFT"
-			});
-
-			const tx = await txPromise;
-			console.log(`Transaction signature: ${tx}`);
-		} catch (error: any) {
-			console.error("Error minting NFT:", error);
-			toast.error(`Failed to mint NFT: ${error.message}`);
-		}
-	}
-
-	const getCollectionAccount = async () => {
-		const [collectionAccount] = PublicKey.findProgramAddressSync(
-			[Buffer.from("collection")],
-			program.programId
-		);
-		const collectionData = await program.account.collection.fetch(collectionAccount);
-		if (collectionData.collectionAddress.toBase58() !== null) {
-			return collectionData;
-		}
-		return null;
-	}
-
 	const checkCollectionAccount = async () => {
 		const [collectionAccount] = PublicKey.findProgramAddressSync(
 			[Buffer.from("collection")],
@@ -202,6 +135,14 @@ export default function Test() {
 		}
 	}
 
+	const getAdmin = (): PublicKey => {
+		const [admin] = PublicKey.findProgramAddressSync(
+			[Buffer.from("admin")],
+			program.programId
+		);
+		console.log("Admin address:", admin.toBase58());
+		return admin;
+	}
 
 	const createCol = async () => {
 		try {
@@ -290,17 +231,6 @@ export default function Test() {
 				className="px-4 py-2 bg-green-500 text-white rounded disabled:bg-green-300"
 			>
 				check template</button>
-
-			<input type="text" value={nameAsset} placeholder="Asset name" onChange={(e) => setNameAsset(e.target.value)} />
-			<input type="text" value={creatorAsset} placeholder="Asset creator" onChange={(e) => setCreatorAsset(e.target.value)} />
-			<button
-				onClick={mint}
-				// disabled={loading}
-				className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-blue-300"
-			>
-				mint a nft
-				{/* {loading ? "Processing..." : "Create Collection"} */}
-			</button>
 
 			<p>Collection: {collectionPublicKey ?? 'Not created yet'}</p>
 		</main>
